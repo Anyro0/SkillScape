@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillScape</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SkillScape</h1>
+            <p>Insert your skills to be analyzed</p>
+        </div>
+
+        <div class="input-section">
+            <div id="error-message"></div>
+            
+            <div class="input-group">
+                <label for="skills">Your skills</label>
+                <textarea 
+                    id="skills" 
+                    placeholder="Example: Python, JavaScript, React, SQL, Docker, Machine Learning..."
+                ></textarea>
+                <div class="hint">Insert skills separated by comas</div>
+            </div>
+
+            <button id="analyzeBtn" onclick="analyzeSkills()">
+                Analyze
+            </button>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            Annalyzing...
+        </div>
+
+        <div id="results" class="results-section"></div>
+    </div>
+
+    <script>
+        async function analyzeSkills() {
+            const skillsInput = document.getElementById('skills').value.trim();
+            const errorDiv = document.getElementById('error-message');
+            const resultsDiv = document.getElementById('results');
+            const loadingDiv = document.getElementById('loading');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+
+            errorDiv.innerHTML = '';
+            errorDiv.className = '';
+
+            if (!skillsInput) {
+                errorDiv.className = 'error';
+                errorDiv.innerHTML = 'Please insert one skill at minimum';
+                return;
+            }
+
+            loadingDiv.style.display = 'block';
+            resultsDiv.classList.remove('active');
+            analyzeBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        skills: skillsInput
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Server error: ' + response.status);
+                }
+
+                const data = await response.json();
+                displayResults(data);
+
+            } catch (error) {
+                errorDiv.className = 'error';
+                errorDiv.innerHTML = 'Error: ' + error.message + '<br>Make sure that the python server is running';
+                console.error('Error:', error);
+            } finally {
+                loadingDiv.style.display = 'none';
+                analyzeBtn.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            
+            const categories = [
+                { key: 'all_required_skills', title: 'All skills required', class: 'all-match', emoji: '✅' },
+                { key: 'missing_1_skill', title: '1 skill missing', class: 'missing-1', emoji: '🔵' },
+                { key: 'missing_2_skills', title: '2 skills missing', class: 'missing-2', emoji: '🟠' },
+                { key: 'missing_3_skills', title: '3 skills missing', class: 'missing-3', emoji: '🔴' }
+            ];
+
+            let html = '';
+
+            categories.forEach(function(cat) {
+                const items = data[cat.key] || {};
+                const count = Object.keys(items).length;
+
+                html += '<div class="result-card ' + cat.class + '">';
+                html += '<h3>' + cat.emoji + ' ' + cat.title;
+                html += '<span class="count-badge">' + count + '</span></h3>';
+
+                if (count === 0) {
+                    html += '<div class="empty-state">Tulemusi ei leitud</div>';
+                } else {
+                    Object.entries(items).forEach(function(entry) {
+                        const key = entry[0];
+                        const value = entry[1];
+                        const jobName = value.job_name || key;
+                        const required = value.required || [];
+                        const missing = value.missing || [];
+                        
+                        html += '<div class="job-item">';
+                        html += '<div class="job-title">' + jobName + '</div>';
+                        
+                        if (required.length > 0) {
+                            html += '<div class="job-info"><strong>Nõutud:</strong> ' + required.join(', ') + '</div>';
+                        }
+                        
+                        if (missing.length > 0) {
+                            html += '<div class="job-info" style="color: #ef4444;"><strong>Puudu:</strong> ' + missing.join(', ') + '</div>';
+                        }
+                        
+                        html += '</div>';
+                    });
+                }
+
+                html += '</div>';
+            });
+
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.add('active');
+        }
+
+        document.getElementById('skills').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                analyzeSkills();
+            }
+        });
+    </script>
+</body>
+</html>
