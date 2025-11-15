@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillScape</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
@@ -107,7 +107,7 @@
                 html += '<span class="count-badge">' + count + '</span></h3>';
 
                 if (count === 0) {
-                    html += '<div class="empty-state">Tulemusi ei leitud</div>';
+                    html += '<div class="empty-state">No result found</div>';
                 } else {
                     Object.entries(items).forEach(function(entry) {
                         const key = entry[0];
@@ -120,11 +120,11 @@
                         html += '<div class="job-title">' + jobName + '</div>';
                         
                         if (required.length > 0) {
-                            html += '<div class="job-info"><strong>Nõutud:</strong> ' + required.join(', ') + '</div>';
+                            html += '<div class="job-info"><strong>Required:</strong> ' + required.join(', ') + '</div>';
                         }
                         
                         if (missing.length > 0) {
-                            html += '<div class="job-info" style="color: #ef4444;"><strong>Puudu:</strong> ' + missing.join(', ') + '</div>';
+                            html += '<div class="job-info" style="color: #ef4444;"><strong>Missing:</strong> ' + missing.join(', ') + '</div>';
                         }
                         
                         html += '</div>';

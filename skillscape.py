@@ -7,17 +7,13 @@ Original file is located at
     https://colab.research.google.com/drive/1GDADnatjYM-sEldCdvHIOjR_M6drWm7C
 """
 
-from google.colab import drive
-drive.mount('/content/drive')
-import os
-os.chdir('/content/drive/My Drive/Colab Notebooks/')
 import numpy as np
 import pandas as pd
 import csv
 import nltk
 from nltk.probability import *
 
-def preprocess(skillsfile,job_info_file): # read skills and make them into a dictionary with links as keys
+def preprocess(skillsfile,job_info_file):
   i = 0
   fails = ["sorry","unable","apologize","cannot", "frameworks languages softwares","does not contain","no technical","do not have access","does not mention anything","no data","no relevant"]
   with open(skillsfile) as f:
@@ -156,8 +152,16 @@ def get_jobs_info_dict(jobs_dict, user_skills):
   result['skills_missing_3'] = skills_missing_3
   return result
 
-input = ["example skill","microsoft","computer","money laundering","python","java"]
-result = get_jobs_info_dict(jobs_dict, input)
-
-result['skills_missing_1']
-
+def analyze_user_skills(user_skills):
+    raw = get_jobs_info_dict(jobs_dict, user_skills)
+    
+    def normalize(obj):
+        if isinstance(obj, set):
+            return list(obj)
+        if isinstance(obj, dict):
+            return {k: normalize(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [normalize(x) for x in obj]
+        return obj
+    
+    return normalize(raw)
