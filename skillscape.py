@@ -7,10 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1GDADnatjYM-sEldCdvHIOjR_M6drWm7C
 """
 
-from google.colab import drive
-drive.mount('/content/drive')
-import os
-os.chdir('/content/drive/My Drive/Colab Notebooks/')
 import numpy as np
 import pandas as pd
 import csv
@@ -156,8 +152,18 @@ def get_jobs_info_dict(jobs_dict, user_skills):
   result['skills_missing_3'] = skills_missing_3
   return result
 
-input = ["example skill","microsoft","computer","money laundering","python","java"]
-result = get_jobs_info_dict(jobs_dict, input)
 
-result['skills_missing_1']
+def analyze_user_skills(user_skills):
+    raw = get_jobs_info_dict(jobs_dict, user_skills)
+    
+    def normalize(obj):
+        if isinstance(obj, set):
+            return list(obj)
+        if isinstance(obj, dict):
+            return {k: normalize(v) for k, v in obj.items()}
+        if isinstance(obj, list):
+            return [normalize(x) for x in obj]
+        return obj
+    
+    return normalize(raw)
 
