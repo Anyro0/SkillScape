@@ -22,7 +22,7 @@
                     id="skills" 
                     placeholder="Example: Python, JavaScript, React, SQL, Docker, Machine Learning..."
                 ></textarea>
-                <div class="hint">Insert skills separated by comas</div>
+                <div class="hint">Insert skills separated by commas</div>
             </div>
 
             <button id="analyzeBtn" onclick="analyzeSkills()">
@@ -90,7 +90,7 @@
             const resultsDiv = document.getElementById('results');
             
             const categories = [
-                { key: 'all_required_skills', title: 'All skills required', class: 'all-match', emoji: '✅' },
+                { key: 'all_required_skills', title: 'All requirements met', class: 'all-match', emoji: '✅' },
                 { key: 'missing_1_skill', title: '1 skill missing', class: 'missing-1', emoji: '🔵' },
                 { key: 'missing_2_skills', title: '2 skills missing', class: 'missing-2', emoji: '🟠' },
                 { key: 'missing_3_skills', title: '3 skills missing', class: 'missing-3', emoji: '🔴' }
